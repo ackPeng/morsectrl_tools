@@ -20,7 +20,7 @@ jobs:
         push: "never"
         runCmd: |
           set -euo pipefail
-          make deb
+          make -f Makefile.deb deb
     - id: "artifacts_path"
       name: "Workaround actions/upload-artifact#176"
       run: |
