@@ -1,0 +1,20 @@
+export DEB_CFLAGS_MAINT_APPEND = -pthread
+
+# Cross-compiler environment
+export CC = aarch64-linux-gnu-gcc
+export CXX = aarch64-linux-gnu-g++
+export LD = aarch64-linux-gnu-ld
+export AR = aarch64-linux-gnu-ar
+export RANLIB = aarch64-linux-gnu-ranlib
+export STRIP = aarch64-linux-gnu-strip
+
+# PKG_CONFIG for cross-compilation
+export PKG_CONFIG_PATH =
+export PKG_CONFIG_LIBDIR = /usr/lib/aarch64-linux-gnu/pkgconfig:/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR = /
+
+override_dh_shlibdeps:
+	dh_shlibdeps -l/usr/lib/aarch64-linux-gnu/
+
+override_dh_makeshlibs:
+	dh_makeshlibs -- -c0

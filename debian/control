@@ -1,0 +1,21 @@
+Source: morsectrl-tools
+Section: net
+Priority: optional
+Maintainer: Radxa Computer Co., Ltd <dev@radxa.com>
+Build-Depends: debhelper-compat (= 13),
+ quilt,
+ libnl-3-dev:arm64,
+ libnl-genl-3-dev:arm64,
+ libnl-route-3-dev:arm64,
+ pkg-config,
+Standards-Version: 4.6.2
+Homepage: https://github.com/Morse-Microchip-ICO
+Rules-Requires-Root: no
+
+Package: morsectrl-tools
+Architecture: arm64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Morse controller for WiFi AP
+ Morse controller is a user space daemon for controlling WiFi AP
+ functionality. This package is built specifically for AIC FCS960K
+ platform with cross-compilation and NL80211 transport support.

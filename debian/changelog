@@ -1,0 +1,9 @@
+morsectrl-tools (1.9.4-1) unstable; urgency=medium
+
+  * Initial release for AIC FCS960K chip
+  * Based on morsectrl rel_1_9_4_2023_Nov_02
+  * Cross-compiled for arm64 architecture
+  * Configured with libnl-3 for NL80211 transport support
+  * CONFIG_MORSE_TRANS_NL80211=y enabled
+
+ -- Radxa Computer Co., Ltd <dev@radxa.com>  Sun, 19 Jan 2026 00:00:00 +0000

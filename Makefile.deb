@@ -1,0 +1,98 @@
+-include .github/local/Makefile.local
+
+PROJECT ?= morsectrl-tools
+CUSTOM_DEBUILD_ENV ?= DEB_BUILD_OPTIONS='parallel=1'
+CUSTOM_DEBUILD_ARG ?=
+
+.DEFAULT_GOAL := all
+.PHONY: all
+all: build
+
+.PHONY: devcontainer_setup
+devcontainer_setup: pre_build_dep main_build_dep post_build_dep
+
+.PHONY: pre_build_dep
+pre_debuild:
+
+# Main build dependencies - install cross-compilation toolchain and dependencies
+.PHONY: main_build_dep
+main_build_dep:
+	sudo dpkg --add-architecture arm64
+	sudo apt-get update
+	sudo apt-get install -y crossbuild-essential-arm64 binfmt-support qemu-user-static
+	sudo apt-get install -y \
+		autoconf automake libtool \
+		pkg-config \
+		libnl-3-dev:arm64 \
+		libnl-genl-3-dev:arm64 \
+		libnl-route-3-dev:arm64 \
+		git-buildpackage \
+		devscripts \
+		dh-exec \
+		dh-sequence-python3 \
+		lintian
+
+# Additional cross-build dependencies
+.PHONY: arm64_crossbuild_dep
+arm64_crossbuild_dep:
+	sudo apt-get build-dep . -y --host-architecture arm64 || true
+
+.PHONY: post_build_dep
+post_build_dep:
+
+.PHONY: test
+test:
+
+.PHONY: build
+build: pre_build main_build post_build
+
+.PHONY: pre_build
+pre_build:
+	chmod +x debian/rules
+
+.PHONY: main_build
+main_build:
+
+.PHONY: post_build
+post_build:
+
+# distclean target - for cleaning everything
+.PHONY: distclean
+distclean: clean
+
+# clean target - called by debuild
+.PHONY: clean
+clean:
+	rm -rf debian/.debhelper debian/$(PROJECT)*/ debian/tmp/ debian/debhelper-build-stamp debian/files debian/*.debhelper.log debian/*.*.debhelper debian/*.substvars
+
+.PHONY: clean-deb
+clean-deb:
+	rm -rf debian/.debhelper debian/$(PROJECT)*/ debian/tmp/ debian/debhelper-build-stamp debian/files debian/*.debhelper.log debian/*.*.debhelper debian/*.substvars
+
+.PHONY: dch
+dch: debian/changelog
+	gbp dch --ignore-branch --multimaint-merge --release --spawn-editor=never \
+		--git-log='--no-merges --perl-regexp --invert-grep --grep=^(chore:\stemplates\sgenerated)' \
+		--dch-opt=--upstream --commit --commit-msg="feat: release %(version)s"
+
+.PHONY: deb
+deb: debian pre_debuild binary post_debuild
+
+.PHONY: pre_debuild
+pre_debuild:
+	# Set cross-compiler environment variables
+	$(eval export CC=aarch64-linux-gnu-gcc)
+	$(eval export CXX=aarch64-linux-gnu-g++)
+
+.PHONY: binary
+binary:
+	$(CUSTOM_DEBUILD_ENV) CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ fakeroot debian/rules binary
+
+.PHONY: post_debuild
+post_debuild:
+	@echo "Packages are in: output/"
+	@ls -lh output/*.deb 2>/dev/null || true
+
+.PHONY: release
+release:
+	gh workflow run .github/workflows/new_version.yaml --ref $(shell git branch --show-current)
