@@ -1,6 +1,6 @@
-morsectrl-tools (1.9.4-1) unstable; urgency=medium
+morsectrl-tools (1.0-1) unstable; urgency=medium
 
-  * Initial release for AIC FCS960K chip
+  * Initial release for AIC fgh100m chip
   * Based on morsectrl rel_1_9_4_2023_Nov_02
   * Cross-compiled for arm64 architecture
   * Configured with libnl-3 for NL80211 transport support
